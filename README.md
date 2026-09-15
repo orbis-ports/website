@@ -2,8 +2,7 @@
 
 The public site for the PlayStation 4 ports in this organisation: RetroArchV, Sonic 3 A.I.R. and
 OpenGothic. It is published at `prx0.com`, with the RetroArch core host at `cores.prx0.com`.
-[PLAN.md](PLAN.md) is the plan and its status; [SOURCES.md](SOURCES.md) says where every fact on
-the pages comes from.
+[SOURCES.md](SOURCES.md) says where every fact on the pages comes from.
 
 Python 3 standard library only:
 
