@@ -25,8 +25,8 @@ commit `274fff628c` (branch `ps4-support`), written 2026-09-15.
 
 ⚠ **OpenGothic has no public PS4 package.** Do not link upstream's desktop release as if it were the
 port. Its card must say it is not released yet, and it must switch to a download automatically once
-a PS4 release exists. Pick and document a tag prefix (proposal: `opengothic-ps4-v*`) and match on
-it, the same way RetroArch and Sonic are matched.
+a PS4 release exists. Its tags will be `opengothic-ps4-v<upstream>-r<rev>`, like Sonic's (phase 0); match on
+`opengothic-ps4-v`.
 
 Shared platform facts, true for all three: jailbroken console with GoldHEN; tested on firmware
 11.00 with GoldHEN v2.4b18.10; install the `.pkg` from `/data/pkg` with *Settings → Debug Settings →
@@ -223,18 +223,27 @@ Contract: `https://cores.prx0.com/cores.json`, written by `cores.yml` after `.in
 
 ## 5. Phases
 
-### Phase 0: decisions to confirm with the maintainer before writing deploy code
+### Phase 0: decisions
 
-Build phases 1-3 locally without these. Deploy (phase 5) needs them.
+Decided by the maintainer on 2026-09-15:
 
-1. **Hosting for `prx0.com`.**
-   - Proposal: a second R2 bucket with a custom domain on the apex. It needs the same tooling as
-     today (`wrangler r2 object put`), and no new product.
-   - Alternative: Cloudflare Pages.
-2. **URL layout** from section 3 (`/`, `/retroarch/`, `/sonic3air/`, `/opengothic/`).
-3. **OpenGothic tag prefix** for its future PS4 releases.
-4. **Secrets for this repo:** `CLOUDFLARE_API_TOKEN` (scoped to the site bucket, plus write on
-   `orbis-cores` for `index.html` and the redirect only) and `CLOUDFLARE_ACCOUNT_ID`.
+1. **Hosting.** The site is served at the apex, **`https://prx0.com/`**, from a **second R2 bucket**
+   with `prx0.com` as its custom domain, alongside `orbis-cores` (which stays as it is). Deploy with
+   `npx wrangler@4 r2 object put … --remote`, the same as the cores workflow.
+   - The bucket and its custom domain are created by the maintainer in the Cloudflare dashboard, or
+     with `wrangler r2 bucket create` from their own shell.
+   - Record the bucket name here once it exists. Give it to CI as the repository variable
+     `R2_SITE_BUCKET`.
+   - R2 serves no index documents: `https://prx0.com/` does not map to `index.html` by itself.
+     Measure how the custom domain answers `/` and `/retroarch/` before phase 5. If it needs it, add a
+     Cloudflare rule, or publish each page also under its bare key (`retroarch/` →
+     `retroarch/index.html`). The cores bucket today answers `/` with a 302 to `index.html`, so
+     check what that rule is before inventing another.
+2. **URL layout** as in section 3: `/`, `/retroarch/`, `/sonic3air/`, `/opengothic/`.
+3. **OpenGothic tag format** follows Sonic's: `opengothic-ps4-v<upstream version>-r<PS4 release
+   number>`, e.g. `opengothic-ps4-v0.92-r1`. Match on the prefix `opengothic-ps4-v`.
+4. **Secrets, still open.** `CLOUDFLARE_API_TOKEN` (write on the site bucket, plus `orbis-cores`
+   for `index.html` only) and `CLOUDFLARE_ACCOUNT_ID` in this repository.
    - ⚠ **The token value never passes through an agent conversation or shell history.** The
      maintainer enters it at a prompt, e.g. `gh secret set CLOUDFLARE_API_TOKEN -R orbis-ports/website`
      (it reads stdin), or from a `umask 077` file that is wiped afterwards.
