@@ -1,0 +1,8 @@
+[
+  {"name": "mesa-ps4", "repo": "orbis-ports/mesa-ps4",
+   "what": "Mesa for the PlayStation 4: RADV for Vulkan, and OpenGL 4.6 through zink on top of it.",
+   "license": "MIT", "license_source": "docs/license.rst in mesa-ps4; GitHub detects no single licence for Mesa"},
+  {"name": "orbis-compat", "repo": "orbis-ports/orbis-compat",
+   "what": "The platform overlay: OpenOrbis toolchain files, libc and pthread shims, a Vulkan loader shim, packaging and console logging.",
+   "license": null}
+]

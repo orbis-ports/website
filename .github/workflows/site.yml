@@ -1,0 +1,144 @@
+# prx0.com: build the site, check it, and publish it from main.
+#
+# Rebuilt on a push, by hand, when another repository says something changed, and once a day in case
+# a dispatch never came:
+#   retroarch-cores   orbis-ports/RetroArch's cores run published a new cores.json (PLAN.md phase 6)
+#   port-release      a port cut a release, so a card offers the new version without waiting
+#
+# ⚠ NOTHING HERE MAY TOUCH THE CORES IN orbis-cores. cores.prx0.com/.index-extended and every
+# *_libretro.prx.zip beside it are what installed RetroArch packages download from (PLAN.md 2.3).
+# The only object this workflow writes there is index.html, the redirect, and only once the
+# repository variable R2_CORES_BUCKET is set for it (PLAN.md phase 5).
+
+name: site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  repository_dispatch:
+    types: [retroarch-cores, port-release]
+  schedule:
+    - cron: '17 5 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site
+  cancel-in-progress: false
+
+env:
+  CORES_JSON_URL: https://cores.prx0.com/cores.json
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # ⚠ THE CODE CHECK RUNS ON THE FIXTURE, NOT ON LIVE DATA. A new cores run legitimately changes
+      # rows and commits, so comparing a live render with the previous one would fail on every good
+      # publish. The fixture and the page make-site.py rendered from the same cores never change,
+      # so a difference here is a change in site.py.
+      - name: Parity with the page make-site.py published
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 site.py --cores-json fixtures/cores.json --out "$RUNNER_TEMP/fixture-site"
+          python3 tools/parity.py fixtures/make-site-2026-09-15.html "$RUNNER_TEMP/fixture-site/retroarch/index.html" \
+            --allow tools/parity-allow-make-site.tsv
+
+      # Until the cores workflow writes cores.json (PLAN.md phase 6) there is none to read, and the
+      # fixture describes the cores that are published today. Say which one was used.
+      - name: Build
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if curl -fsS -o cores.json "$CORES_JSON_URL"; then
+            src=cores.json
+          else
+            echo "::warning::$CORES_JSON_URL is not there yet; building from fixtures/cores.json"
+            src=fixtures/cores.json
+          fi
+          python3 site.py --cores-json "$src" --out out --redirect redirect/index.html
+          echo "== built from $src" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Check pages and links
+        run: |
+          set -euo pipefail
+          python3 tools/check-html.py out --external
+          python3 tools/check-html.py redirect
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: |
+            out/
+            redirect/
+          if-no-files-found: error
+
+  deploy:
+    needs: build
+    # ⚠ SKIPPED UNTIL PHASE 5: the site bucket does not exist before the maintainer creates it and
+    # sets R2_SITE_BUCKET. Only main deploys.
+    if: github.ref == 'refs/heads/main' && vars.R2_SITE_BUCKET != ''
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+
+      - name: Upload the site
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          BUCKET: ${{ vars.R2_SITE_BUCKET }}
+        run: |
+          set -euo pipefail
+          cd out
+          find . -type f | sed 's#^\./##' | sort | while read -r key; do
+            case "$key" in
+              *.html) type='text/html; charset=utf-8'; cache='no-cache' ;;
+              *.png)  type='image/png'; cache='public, max-age=86400' ;;
+              *) echo "!! unexpected file $key" >&2; exit 1 ;;
+            esac
+            echo "== $key"
+            npx --yes wrangler@4 r2 object put "$BUCKET/$key" --file "$key" \
+              --content-type "$type" --cache-control "$cache" --remote
+          done
+
+      # ⚠ R2 SERVES NO INDEX DOCUMENTS. Whether / and /retroarch/ reach index.html depends on a
+      # rule on the custom domain (PLAN.md phase 0.1); this step fails until they do.
+      - name: The pages answer
+        run: |
+          set -euo pipefail
+          for path in "" retroarch/ sonic3air/ opengothic/; do
+            code="$(curl -s -o /dev/null -w '%{http_code}' -L --retry 5 --retry-delay 3 "https://prx0.com/${path}?v=${GITHUB_RUN_ID}")"
+            echo "== https://prx0.com/$path -> $code"
+            [ "$code" = 200 ] || exit 1
+          done
+
+      # Only after prx0.com/retroarch/ answers, and only when R2_CORES_BUCKET is set. One object,
+      # by name; never a sync, never a delete.
+      - name: Redirect cores.prx0.com/index.html
+        if: vars.R2_CORES_BUCKET != ''
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          BUCKET: ${{ vars.R2_CORES_BUCKET }}
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4 r2 object put "$BUCKET/index.html" --file redirect/index.html \
+            --content-type 'text/html; charset=utf-8' --cache-control 'no-store' --remote
+
+      - name: The core downloader still answers
+        run: |
+          set -euo pipefail
+          code="$(curl -s -o /dev/null -w '%{http_code}' https://cores.prx0.com/.index-extended)"
+          echo "== .index-extended -> $code"; [ "$code" = 200 ]
+          f="$(curl -s https://cores.prx0.com/.index-extended | awk 'NR==1{print $3}')"
+          code="$(curl -s -o /dev/null -w '%{http_code}' "https://cores.prx0.com/$f")"
+          echo "== $f -> $code"; [ "$code" = 200 ]

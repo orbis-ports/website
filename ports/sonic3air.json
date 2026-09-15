@@ -1,0 +1,17 @@
+{
+  "id": "sonic3air",
+  "order": 2,
+  "name": "Sonic 3 A.I.R.",
+  "repo": "orbis-ports/sonic3air",
+  "branch": "ps4-support",
+  "tag_prefix": "sonic3air-ps4-v",
+  "pkg_asset": "Sonic3AIR-PS4-*.pkg",
+  "title_id": "SAIR00001",
+  "icon": "icons/sonic3air.png",
+  "summary": "Sonic 3 - Angel Island Revisited, a fan-made remaster of Sonic 3 & Knuckles.",
+  "notes_path": "Oxygen/sonic3air/build/_ps4/RELEASE-NOTES.md",
+  "page": "notes",
+  "requires": ["The Sonic 3 & Knuckles ROM from the Steam release, not included"],
+  "files_in": "/data/sonic3air/",
+  "quit": "Exit in the game's main menu"
+}

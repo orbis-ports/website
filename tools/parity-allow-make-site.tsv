@@ -1,0 +1,15 @@
+# Differences between the page make-site.py published at cores.prx0.com (index 2026-09-15) and
+# site.py's render of fixtures/cores.json that are corrections, not regressions. Read by
+# tools/parity.py --allow. core<TAB>field<TAB>reason.
+#
+# make-site.py read the libretro-super recipe but not ps4/core-recipe-extra, which build-cores.sh
+# lets win; and it linked a patched build's "<sha>+N" as a tree, which is not a commit (404).
+dirksimple_libretro.prx.zip	source	built as <sha>+N: tree/<sha>+N answered 404; now the upstream commit plus ps4/core-patches/dirksimple at the frontend commit
+flycast_libretro.prx.zip	source	built as <sha>+N: tree/<sha>+N answered 404; now the upstream commit plus ps4/core-patches/flycast at the frontend commit
+melondsds_libretro.prx.zip	source	built as <sha>+N: tree/<sha>+N answered 404; now the upstream commit plus ps4/core-patches/melondsds at the frontend commit
+mupen64plus_next_libretro.prx.zip	source	built as <sha>+N: tree/<sha>+N answered 404; now the upstream commit plus ps4/core-patches/mupen64plus_next at the frontend commit
+pcsx_rearmed_libretro.prx.zip	source	built as <sha>+N: tree/<sha>+N answered 404; now the upstream commit plus ps4/core-patches/pcsx_rearmed at the frontend commit
+swanstation_libretro.prx.zip	source	built as <sha>+N: tree/<sha>+N answered 404; now the upstream commit plus ps4/core-patches/swanstation at the frontend commit
+tic80_libretro.prx.zip	source	built as <sha>+N: tree/<sha>+N answered 404; now the upstream commit plus ps4/core-patches/tic80 at the frontend commit
+dosbox_pure_libretro.prx.zip	source	not in the upstream recipe, only in ps4/core-recipe-extra: the old page had no source link at all
+trident_libretro.prx.zip	source	ps4/core-recipe-extra builds orbis-ports/3dsTrident; the old page named upstream DanAlexMorton/3dsTrident

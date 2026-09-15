@@ -1,0 +1,18 @@
+{
+  "id": "retroarch",
+  "order": 1,
+  "name": "RetroArchV",
+  "repo": "orbis-ports/RetroArch",
+  "branch": "ps4-support",
+  "tag_prefix": "retroarch-ps4-v",
+  "pkg_asset": "RetroArchV-PS4-*.pkg",
+  "title_id": "RTRV00001",
+  "icon": "icons/retroarch.png",
+  "summary": "RetroArch, the libretro emulation frontend, with {cores} cores built for this console.",
+  "notes_path": "ps4/RELEASE-NOTES.md",
+  "page": "retroarch",
+  "requires": ["Network for the Core Downloader, or the offline bundle"],
+  "files_in": "/data/retroarch/",
+  "quit": "Quit RetroArch in its own menu, or the Quit combo on the pad",
+  "tested_on": {"firmware": "11.00", "goldhen": "v2.4b18.10", "by": "SiSTRo"}
+}
