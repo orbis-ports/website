@@ -14,5 +14,5 @@
   "requires": ["Network for the Core Downloader, or the offline bundle"],
   "files_in": "/data/retroarch/",
   "quit": "Quit RetroArch in its own menu, or the Quit combo on the pad",
-  "tested_on": {"firmware": "11.00", "goldhen": "v2.4b18.10", "by": "SiSTRo"}
+  "tested_on": {"firmware": "11.00", "goldhen": "v2.4b18.10", "goldhen_by": "SiSTRo"}
 }

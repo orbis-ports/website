@@ -44,7 +44,7 @@ Abbreviations:
 | OpenGothic needs your own Gothic II installation, not included; a USB keyboard | OG notes, Install 2 and 3 |
 | Copy the `.pkg` to `/data/pkg` over FTP; Settings → Debug Settings → Package Installer | RA notes "Install" |
 | … or GoldHEN's own package installer | Sonic release and OG notes, Install 1 |
-| RetroArchV tested on firmware 11.00 with GoldHEN v2.4b18.10, by SiSTRo; other firmware may work, nobody has checked | RA notes "Install"; values in `ports/retroarch.json` `tested_on` |
+| RetroArchV tested on firmware 11.00 with GoldHEN v2.4b18.10 by SiSTRo (the GoldHEN build's author); other firmware may work, nobody has checked | RA notes "Install": "GoldHEN v2.4b18.10 (SiSTRo)"; values in `ports/retroarch.json` `tested_on` |
 | Sonic 3 A.I.R. and OpenGothic tested on firmware 11.00 with GoldHEN v2.4b18.10; masthead pills | the maintainer, 2026-09-15 (not in their release notes); values in `ports/*.json` `tested_on`. The pills show only while every port shares the pair |
 | Each port installs under its own title id; collisions are decided by title id | RA notes "Install" |
 | Title ids RTRV00001, SAIR00001, TMPS10021 | RA notes; Sonic release Install 1; OG notes Install 1 |

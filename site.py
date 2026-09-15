@@ -571,22 +571,22 @@ def render_landing(ports, rels, cores, platform, licences):
         '<tr><td><a href="%s/">%s</a></td><td class="mono">%s</td><td class="mono">%s</td><td class="sys">%s</td></tr>'
         % (e(p["id"]), e(p["name"]), e(p["title_id"]), e(p["files_in"]), e(p["quit"])) for p in ports)
 
-    # One sentence per firmware and GoldHEN pair, naming the ports tested on it - and who tested,
-    # where that is written down.
+    # One sentence per firmware and GoldHEN build, naming the ports tested on it. goldhen_by is who
+    # made that GoldHEN build (the release notes' "GoldHEN v2.4b18.10 (SiSTRo)"), not who tested.
     groups = {}
     for p in ports:
         if p.get("tested_on"):
-            key = (p["tested_on"]["firmware"], p["tested_on"]["goldhen"])
-            by = p["tested_on"].get("by")
-            groups.setdefault(key, []).append(e(p["name"]) + (" (by %s)" % e(by) if by else ""))
+            key = (p["tested_on"]["firmware"], p["tested_on"]["goldhen"], p["tested_on"].get("goldhen_by", ""))
+            groups.setdefault(key, []).append(e(p["name"]))
     tested = "".join(
-        "<p><b>Tested on firmware %s with GoldHEN %s</b>: %s. Other firmware and other jailbreak builds "
+        "<p><b>Tested on firmware %s with GoldHEN %s%s</b>: %s. Other firmware and other jailbreak builds "
         "may work — nobody has checked, and a report either way is useful.</p>"
-        % (e(fw), e(gh), ", ".join(names)) for (fw, gh), names in groups.items())
+        % (e(fw), e(gh), " by %s" % e(by) if by else "", ", ".join(names))
+        for (fw, gh, by), names in groups.items())
     # The masthead shows the pair only when every port shares it; otherwise the sentences say it.
     pills = ""
     if len(groups) == 1 and sum(len(n) for n in groups.values()) == len(ports):
-        fw, gh = next(iter(groups))
+        fw, gh, _ = next(iter(groups))
         pills = ('<div class="meta"><span class="pill">Firmware <b>%s</b></span>'
                  '<span class="pill">GoldHEN <b>%s</b></span></div>' % (e(fw), e(gh)))
 

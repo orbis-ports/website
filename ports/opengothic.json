@@ -19,6 +19,7 @@
   "quit": "Exit in the game's main menu",
   "tested_on": {
     "firmware": "11.00",
-    "goldhen": "v2.4b18.10"
+    "goldhen": "v2.4b18.10",
+    "goldhen_by": "SiSTRo"
   }
 }
