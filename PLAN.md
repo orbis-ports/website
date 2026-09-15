@@ -82,7 +82,7 @@ for, and each one must survive the move:
   - the latest `retroarch-ps4-v*` release: pkg URL, size, version.
 - **When it rebuilds.** Only when a cores run publishes. A new frontend tag does not refresh the
   page, so it keeps offering the old version until the next cores run. This is a known defect of
-  the current setup; fix it here (5.3).
+  the current setup; phase 6 step 2 fixes it.
 - `https://prx0.com/` (the apex) resolves to Cloudflare but serves nothing today (HTTP connect
   fails).
 
@@ -95,8 +95,9 @@ RetroArch package already installed on consoles. RetroArch builds each download 
 **`https://cores.prx0.com/.index-extended` and every `https://cores.prx0.com/*_libretro.prx.zip` must
 keep answering 200 at exactly those URLs, through every phase of this work.** R2 is the host
 because it keeps the leading dot in `.index-extended`; GitHub Releases rename it. Nothing in this
-repository may write, prune or re-prefix objects in that bucket, except `index.html` and the bundle
-(and the redirect in phase 5). The cores workflow in RetroArch owns everything else there.
+repository may write, prune or re-prefix objects in that bucket except `index.html`, which becomes the
+redirect in phase 5. The cores workflow in RetroArch owns everything else there, the bundle and
+`cores.json` included.
 
 Check after every deploy:
 
