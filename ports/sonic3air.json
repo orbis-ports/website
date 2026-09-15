@@ -11,7 +11,13 @@
   "summary": "Sonic 3 - Angel Island Revisited, a fan-made remaster of Sonic 3 & Knuckles.",
   "notes_path": "Oxygen/sonic3air/build/_ps4/RELEASE-NOTES.md",
   "page": "notes",
-  "requires": ["The Sonic 3 & Knuckles ROM from the Steam release, not included"],
+  "requires": [
+    "The Sonic 3 & Knuckles ROM from the Steam release, not included"
+  ],
   "files_in": "/data/sonic3air/",
-  "quit": "Exit in the game's main menu"
+  "quit": "Exit in the game's main menu",
+  "tested_on": {
+    "firmware": "11.00",
+    "goldhen": "v2.4b18.10"
+  }
 }

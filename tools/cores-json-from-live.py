@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write cores.json (PLAN.md 4.2) for a cores set that is already published.
+"""Write cores.json, the data site.py renders the RetroArch page from, for a published cores set.
 
 The cores workflow in orbis-ports/RetroArch is meant to write this file itself, next to
 .index-extended, because only that job holds every input at once. Until it does, this rebuilds the
@@ -22,7 +22,7 @@ artifacts carry the CRC of each .prx, so the manifests are only used after every
 checked against the published index.
 
 Every input has a local override (--index, --recipe, --recipe-extra, --info) so the cores workflow
-can run this same code inside the publish job once it takes over (PLAN.md phase 6).
+can run this same code inside the publish job once it takes over.
 """
 
 import argparse
@@ -37,7 +37,7 @@ import urllib.error
 import urllib.request
 
 FRONTEND_REPO = "orbis-ports/RetroArch"
-# The commit PLAN.md is pinned to; the run that published the 2026-09-15 index was built from it.
+# orbis-ports/RetroArch ps4-support at 274fff628c: the run that published the 2026-09-15 index was built from it.
 FRONTEND_COMMIT = "274fff628c7b185f1bd926b32afb3f77b82cf3c0"
 RECIPE_PATH = "recipes/linux/cores-linux-x64-generic"
 

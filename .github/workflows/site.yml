@@ -2,13 +2,13 @@
 #
 # Rebuilt on a push, by hand, when another repository says something changed, and once a day in case
 # a dispatch never came:
-#   retroarch-cores   orbis-ports/RetroArch's cores run published a new cores.json (PLAN.md phase 6)
+#   retroarch-cores   orbis-ports/RetroArch's cores run published a new cores.json
 #   port-release      a port cut a release, so a card offers the new version without waiting
 #
 # ⚠ NOTHING HERE MAY TOUCH THE CORES IN orbis-cores. cores.prx0.com/.index-extended and every
-# *_libretro.prx.zip beside it are what installed RetroArch packages download from (PLAN.md 2.3).
+# *_libretro.prx.zip beside it are what installed RetroArch packages download from.
 # The only object this workflow writes there is index.html, the redirect, and only once the
-# repository variable R2_CORES_BUCKET is set for it (PLAN.md phase 5).
+# variable R2_CORES_BUCKET is set for it.
 
 name: site
 
@@ -50,7 +50,7 @@ jobs:
           python3 tools/parity.py fixtures/make-site-2026-09-15.html "$RUNNER_TEMP/fixture-site/retroarch/index.html" \
             --allow tools/parity-allow-make-site.tsv
 
-      # Until the cores workflow writes cores.json (PLAN.md phase 6) there is none to read, and the
+      # Until the cores workflow writes cores.json there is none to read, and the
       # fixture describes the cores that are published today. Say which one was used.
       - name: Build
         env:
@@ -82,8 +82,7 @@ jobs:
 
   deploy:
     needs: build
-    # ⚠ SKIPPED UNTIL PHASE 5: the site bucket does not exist before the maintainer creates it and
-    # sets R2_SITE_BUCKET. Only main deploys.
+    # ⚠ SKIPPED WITHOUT R2_SITE_BUCKET: nothing deploys until the maintainer sets it. Only main deploys.
     if: github.ref == 'refs/heads/main' && vars.R2_SITE_BUCKET != ''
     runs-on: ubuntu-24.04
     steps:
@@ -111,7 +110,7 @@ jobs:
           done
 
       # ⚠ R2 SERVES NO INDEX DOCUMENTS. Whether / and /retroarch/ reach index.html depends on a
-      # rule on the custom domain (PLAN.md phase 0.1); this step fails until they do.
+      # URL Rewrite rule on the prx0.com zone; this step fails until they do.
       - name: The pages answer
         run: |
           set -euo pipefail

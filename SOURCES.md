@@ -24,7 +24,7 @@ Abbreviations:
 | Sonic 3 A.I.R. and OpenGothic page bodies | the release body verbatim; with no release, `notes_path` on `branch` |
 | Licence of a port repository (Sonic GPL-3.0, OpenGothic MIT) | GitHub REST `GET /repos/{repo}`, `license.spdx_id` |
 | orbis-compat licence (MIT) | the same |
-| Core rows, sizes, commits, repositories, names, systems, licences, index date, bundle | `cores.json` (PLAN.md 4.2) |
+| Core rows, sizes, commits, repositories, names, systems, licences, index date, bundle | `cores.json`, as `tools/cores-json-from-live.py` writes it |
 | "N of the M cores in the build recipe do not build" | `cores.json` `recipe_missing` / `recipe_total`, counted from the run's manifests; 69 of 182 agrees with RA notes "Known limits" |
 | "N of the M have been run on a real PlayStation 4", verdicts, notes | `data/retroarch/core-tested.tsv` (evidence column per row) |
 | Recommended settings | `data/retroarch/core-options.tsv` (evidence column per row) |
@@ -45,6 +45,7 @@ Abbreviations:
 | Copy the `.pkg` to `/data/pkg` over FTP; Settings → Debug Settings → Package Installer | RA notes "Install" |
 | … or GoldHEN's own package installer | Sonic release and OG notes, Install 1 |
 | RetroArchV tested on firmware 11.00 with GoldHEN v2.4b18.10, by SiSTRo; other firmware may work, nobody has checked | RA notes "Install"; values in `ports/retroarch.json` `tested_on` |
+| Sonic 3 A.I.R. and OpenGothic tested on firmware 11.00 with GoldHEN v2.4b18.10; masthead pills | the maintainer, 2026-09-15 (not in their release notes); values in `ports/*.json` `tested_on`. The pills show only while every port shares the pair |
 | Each port installs under its own title id; collisions are decided by title id | RA notes "Install" |
 | Title ids RTRV00001, SAIR00001, TMPS10021 | RA notes; Sonic release Install 1; OG notes Install 1 |
 | Keeps its files in `/data/retroarch/` | make-site page "Where everything lives" |
@@ -64,6 +65,7 @@ Abbreviations:
 |---|---|
 | Tagline | the summary, as on the landing page |
 | Title id pill | as on the landing page |
+| Firmware and GoldHEN pills | as on the landing page |
 | "Before you start": jailbroken console with GoldHEN, and the requirements | as on the landing page |
 | Everything under "The notes below are the text of the release …" | the release body, rendered, not edited |
 | While unreleased: "There is no PlayStation 4 package yet" | GitHub releases: none with the port's tag prefix |
@@ -79,7 +81,7 @@ it. Changed or added:
 | Sentence | Source |
 |---|---|
 | Tagline: "Vulkan through RADV and desktop OpenGL 4.6 through zink" (was "OpenGL ES") | RA notes line 3 |
-| Install: now a link to the landing page's install section; title id paragraph kept | PLAN.md section 3 |
+| Install: now a link to the landing page's install section; title id paragraph kept | the install steps are shared by all ports and written once, on the landing page |
 | Directory table: `/data/retroarch/shader-cache` | RA notes "New in v0.1.8", "Less stutter when new shaders appear" |
 | Source list: orbis-ports/3dsTrident, the Nintendo 3DS core, forked for this platform | RA notes "New in v0.1.8"; `ps4/core-recipe-extra` trident line |
 | A core built with patches of this port's own also links those patches | `ps4/core-patches/README.md`: "a core built with patches shows `<commit>+<n>`" |
@@ -91,5 +93,5 @@ it. Changed or added:
 
 | Sentence | Source |
 |---|---|
-| The page has moved to prx0.com/retroarch/ | PLAN.md section 3 |
-| The cores are still served from here, so the Core Downloader is unaffected | PLAN.md 2.3; RetroArch `config.def.h:1981` |
+| The page has moved to prx0.com/retroarch/ | this repository publishes the RetroArch page there |
+| The cores are still served from here, so the Core Downloader is unaffected | RetroArch `config.def.h:1981` compiles `https://cores.prx0.com/` in as the core download URL |

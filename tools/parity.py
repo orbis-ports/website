@@ -10,9 +10,9 @@ Each page is a path or a URL. The two must agree on:
   - the licence and its non-commercial mark;
   - the "Built from" links, href and text.
 
-Written for PLAN.md phase 2, comparing site.py's render with the page make-site.py published at
-cores.prx0.com, and kept as the regression test for phase 6: a render from the cores.json the cores
-workflow writes must match the render before it.
+Written to compare site.py's render with the page make-site.py published at
+cores.prx0.com, and kept as the regression test for when the cores workflow starts writing
+cores.json: a render from that file must match the render before it.
 
 --allow names differences that are corrections, one per line: core, field, reason, tab-separated.
 Every allowed difference must occur - a stale allowance is an error too, so the file cannot quietly

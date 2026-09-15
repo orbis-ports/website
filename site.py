@@ -5,10 +5,10 @@
 
 Inputs, and nothing else:
 
-    ports/*.json                 one hand-written file per port (PLAN.md 4.1)
+    ports/*.json                 one hand-written file per port
     GitHub releases              the newest release per port: version, package, size, notes
     GitHub repositories          a port's notes file while it has no release; licences
-    cores.json                   the published RetroArch cores (PLAN.md 4.2)
+    cores.json                   the published RetroArch cores (tools/cores-json-from-live.py)
     data/retroarch/*.tsv         what has run on a console, and recommended core options
     data/platform.json           the projects every port is built on
 
@@ -571,11 +571,24 @@ def render_landing(ports, rels, cores, platform, licences):
         '<tr><td><a href="%s/">%s</a></td><td class="mono">%s</td><td class="mono">%s</td><td class="sys">%s</td></tr>'
         % (e(p["id"]), e(p["name"]), e(p["title_id"]), e(p["files_in"]), e(p["quit"])) for p in ports)
 
+    # One sentence per firmware and GoldHEN pair, naming the ports tested on it - and who tested,
+    # where that is written down.
+    groups = {}
+    for p in ports:
+        if p.get("tested_on"):
+            key = (p["tested_on"]["firmware"], p["tested_on"]["goldhen"])
+            by = p["tested_on"].get("by")
+            groups.setdefault(key, []).append(e(p["name"]) + (" (by %s)" % e(by) if by else ""))
     tested = "".join(
-        "<p><b>%s was tested on firmware %s with GoldHEN %s</b>, by %s. Other firmware and other "
-        "jailbreak builds may work — nobody has checked, and a report either way is useful.</p>"
-        % (e(p["name"]), e(p["tested_on"]["firmware"]), e(p["tested_on"]["goldhen"]), e(p["tested_on"]["by"]))
-        for p in ports if p.get("tested_on"))
+        "<p><b>Tested on firmware %s with GoldHEN %s</b>: %s. Other firmware and other jailbreak builds "
+        "may work — nobody has checked, and a report either way is useful.</p>"
+        % (e(fw), e(gh), ", ".join(names)) for (fw, gh), names in groups.items())
+    # The masthead shows the pair only when every port shares it; otherwise the sentences say it.
+    pills = ""
+    if len(groups) == 1 and sum(len(n) for n in groups.values()) == len(ports):
+        fw, gh = next(iter(groups))
+        pills = ('<div class="meta"><span class="pill">Firmware <b>%s</b></span>'
+                 '<span class="pill">GoldHEN <b>%s</b></span></div>' % (e(fw), e(gh)))
 
     plat = "".join(
         '<li><a href="https://github.com/%s">%s</a> — %s%s</li>'
@@ -590,6 +603,7 @@ def render_landing(ports, rels, cores, platform, licences):
     <p class="tag">Games and emulators from <a href="https://github.com/orbis-ports">orbis-ports</a>, for a
        jailbroken PlayStation&nbsp;4 running GoldHEN. Each one is a package you install yourself.</p>
   </div></div>
+  %s
 </header>
 
 <h2>The ports</h2>
@@ -632,7 +646,7 @@ above; each port's page says what happens otherwise.</p>
   <p>Versions and downloads are read from each port's GitHub releases when this site is built, by
      <code>site.py</code> in <a href="https://github.com/orbis-ports/website">orbis-ports/website</a>.</p>
 </footer>
-""" % ("\n".join(cards), tested, rows, plat)
+""" % (pills, "\n".join(cards), tested, rows, plat)
     return page("PlayStation 4 ports", "PlayStation 4 ports from orbis-ports: RetroArchV, Sonic 3 A.I.R. "
                 "and OpenGothic, for a jailbroken console with GoldHEN.", body, ports[0]["icon"])
 
@@ -647,6 +661,9 @@ def render_notes_page(port, rel, notes, notes_from, licence):
     else:
         pills.append('<span class="pill"><b>Not released yet</b></span>')
     pills.append('<span class="pill">Title id <b>%s</b></span>' % e(port["title_id"]))
+    if port.get("tested_on"):
+        pills.append('<span class="pill">Firmware <b>%s</b></span>' % e(port["tested_on"]["firmware"]))
+        pills.append('<span class="pill">GoldHEN <b>%s</b></span>' % e(port["tested_on"]["goldhen"]))
     needs = "".join("<li>%s</li>" % e(r) for r in port.get("requires", []))
 
     if rel:

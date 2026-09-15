@@ -11,7 +11,14 @@
   "summary": "Open source re-implementation of Gothic 2: Night of the Raven.",
   "notes_path": "ps4/RELEASE-NOTES.md",
   "page": "notes",
-  "requires": ["Your own Gothic II installation, not included", "A USB keyboard"],
+  "requires": [
+    "Your own Gothic II installation, not included",
+    "A USB keyboard"
+  ],
   "files_in": "/data/OpenGothic/",
-  "quit": "Exit in the game's main menu"
+  "quit": "Exit in the game's main menu",
+  "tested_on": {
+    "firmware": "11.00",
+    "goldhen": "v2.4b18.10"
+  }
 }
