@@ -1,7 +1,12 @@
 # prx0.com: build the site, check it, and publish it from main.
 #
-# Rebuilt on a push, by hand, when another repository says something changed, and once a day in case
-# a dispatch never came:
+# Rebuilt on a push, by hand, and every hour.
+#
+# ⚠ THE HOURLY BUILD IS HOW A RELEASE REACHES THE SITE, and it is deliberate. Versions, packages and
+# cores.json are read at build time, so the only question is when the next build runs. A dispatch
+# from the ports would be immediate, but it needs a token in three other repositories that expires
+# and has to be renewed; an hour of staleness costs less than that. The repository_dispatch
+# triggers below still work if one is ever set up again:
 #   retroarch-cores   orbis-ports/RetroArch's cores run published a new cores.json
 #   port-release      a port cut a release, so a card offers the new version without waiting
 #
@@ -19,7 +24,7 @@ on:
   repository_dispatch:
     types: [retroarch-cores, port-release]
   schedule:
-    - cron: '17 5 * * *'
+    - cron: '17 * * * *'
 
 permissions:
   contents: read
@@ -66,10 +71,20 @@ jobs:
           python3 site.py --cores-json "$src" --out out --redirect redirect/index.html
           echo "== built from $src" >> "$GITHUB_STEP_SUMMARY"
 
+      # ⚠ THE EXTERNAL CHECK IS NOT HOURLY. It requests every link on the site, most of them GitHub's,
+      # and hammering them 24 times a day to learn the same answer is rude and slow. Pushes, manual
+      # runs and dispatches check everything; the hourly build checks the pages and their internal
+      # links, and once a day (the 05:17 run) it checks the external ones too.
       - name: Check pages and links
+        env:
+          EVENT: ${{ github.event_name }}
         run: |
           set -euo pipefail
-          python3 tools/check-html.py out --external
+          external=""
+          if [ "$EVENT" != schedule ] || [ "$(date -u +%H)" = 05 ]; then
+            external=--external
+          fi
+          python3 tools/check-html.py out $external
           python3 tools/check-html.py redirect
 
       - uses: actions/upload-artifact@v4
