@@ -105,24 +105,39 @@ jobs:
         with:
           name: site
 
+      # ⚠ ONLY WHAT CHANGED. The site is rebuilt every hour whether anything moved or not, and most
+      # hours nothing did. Each file is compared with what the site already serves and skipped when
+      # the bytes match - a cache-busting query defeats Cloudflare's cache for the comparison (R2
+      # keys have no query, so it still reaches the right object). A file the site does not serve
+      # yet, or serves differently, is uploaded.
       - name: Upload the site
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           BUCKET: ${{ vars.R2_SITE_BUCKET }}
+          SITE: https://prx0.com
         run: |
           set -euo pipefail
           cd out
-          find . -type f | sed 's#^\./##' | sort | while read -r key; do
+          sent=0; kept=0
+          for key in $(find . -type f | sed 's#^\./##' | sort); do
             case "$key" in
               *.html) type='text/html; charset=utf-8'; cache='no-cache' ;;
               *.png)  type='image/png'; cache='public, max-age=86400' ;;
               *) echo "!! unexpected file $key" >&2; exit 1 ;;
             esac
+            live="$(curl -s -H 'Cache-Control: no-cache' "$SITE/$key?v=$GITHUB_RUN_ID" | sha256sum | cut -d' ' -f1)"
+            if [ "$live" = "$(sha256sum "$key" | cut -d' ' -f1)" ]; then
+              echo "-- $key unchanged"
+              kept=$((kept + 1))
+              continue
+            fi
             echo "== $key"
             npx --yes wrangler@4 r2 object put "$BUCKET/$key" --file "$key" \
               --content-type "$type" --cache-control "$cache" --remote
+            sent=$((sent + 1))
           done
+          echo "== $sent uploaded, $kept unchanged" >> "$GITHUB_STEP_SUMMARY"
 
       # ⚠ R2 SERVES NO INDEX DOCUMENTS. Whether / and /retroarch/ reach index.html depends on a
       # URL Rewrite rule on the prx0.com zone; this step fails until they do.
